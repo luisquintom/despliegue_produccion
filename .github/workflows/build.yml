@@ -1,18 +1,31 @@
-name: Docker Build Check
+name: Docker Build and Push
 
 on:
   push:
     tags:
-      - '*' 
+      - '*' # Se ejecuta al crear cualquier tag
 
 jobs:
-  build-image:
-    name: Construir Imagen Docker
-    runs-on: ubuntu-latest 
+  build-and-publish:
+    name: Construir y Publicar en Docker Hub
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Descargar el código del repositorio
         uses: actions/checkout@v4
 
-      - name: Ejecutar la construcción de Docker
-        run: docker build .
+      - name: Iniciar sesión en Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      # Nota: ${{ github.ref_name }} 
+      - name: Construir imagen Docker
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/servidor-spaceops:${{ github.ref_name }} .
+
+      # Subir la imagen a tu repositorio en Docker Hub
+      - name: Subir imagen a Docker Hub (Push)
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/servidor-spaceops:${{ github.ref_name }}
