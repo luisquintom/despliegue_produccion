@@ -26,6 +26,5 @@ jobs:
       - name: Construir imagen Docker
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/servidor-spaceops:${{ github.ref_name }} .
 
-      # Subir la imagen a tu repositorio en Docker Hub
       - name: Subir imagen a Docker Hub (Push)
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/servidor-spaceops:${{ github.ref_name }}
